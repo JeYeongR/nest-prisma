@@ -7,11 +7,11 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../../common/decorator/is-public.decorator';
-import { UserService } from '../../user/user.service';
+import { UserService } from '../user.service';
 import { User } from '@prisma/client';
 
 @Injectable()
-export class AccessTokenAuthGuard implements CanActivate {
+export class TokenAuthGuard implements CanActivate {
   constructor(
     private readonly userService: UserService,
     private reflector: Reflector,
