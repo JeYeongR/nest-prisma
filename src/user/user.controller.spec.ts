@@ -23,6 +23,10 @@ describe('UserController', () => {
     userController = module.get<UserController>(UserController);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(userController).toBeDefined();
   });
@@ -41,8 +45,13 @@ describe('UserController', () => {
       // when
       const result = await userController.createUser(createUserDto);
 
+      const expectedResult = {
+        statusCode: 201,
+        message: 'CREATE_SUCCESS',
+      };
+
       // then
-      expect(result).toBeUndefined();
+      expect(result).toEqual(expectedResult);
       expect(spyCreateUserFn).toHaveBeenCalledTimes(1);
       expect(spyCreateUserFn).toHaveBeenCalledWith(createUserDto);
     });
