@@ -188,4 +188,34 @@ describe('UserService', () => {
       expect(hasThrown).toBeTruthy();
     });
   });
+
+  describe('findOneById()', () => {
+    const id = 1;
+    const mockUser = {
+      id,
+      email: 'test@test.com',
+      password: 'sdadasfgaaegt',
+    };
+
+    it('SUCCESS: 성공적으로 유저를 조회한다.', async () => {
+      // given
+      const spyPrismaUserFindUniqueFn = jest.spyOn(
+        mockPrisma.user,
+        'findUnique',
+      );
+      spyPrismaUserFindUniqueFn.mockResolvedValueOnce(mockUser);
+
+      // when
+      const result = await userService.findOneById(id);
+
+      // then
+      expect(result).toEqual(mockUser);
+      expect(spyPrismaUserFindUniqueFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaUserFindUniqueFn).toHaveBeenCalledWith({
+        where: {
+          id,
+        },
+      });
+    });
+  });
 });
