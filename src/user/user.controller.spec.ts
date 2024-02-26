@@ -7,6 +7,7 @@ describe('UserController', () => {
 
   const mockUserService = {
     createUser: jest.fn(),
+    doLogin: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -54,6 +55,34 @@ describe('UserController', () => {
       expect(result).toEqual(expectedResult);
       expect(spyCreateUserFn).toHaveBeenCalledTimes(1);
       expect(spyCreateUserFn).toHaveBeenCalledWith(createUserDto);
+    });
+  });
+
+  describe('doLogin()', () => {
+    const mockToken = 'token';
+    const loginDto = {
+      email: 'test@test.com',
+      password: 'test1234',
+    };
+
+    it('SUCCESS: UserService의 doLogin()를 정상적으로 호출한다.', async () => {
+      // given
+      const spyDoLoginFn = jest.spyOn(mockUserService, 'doLogin');
+      spyDoLoginFn.mockResolvedValueOnce(mockToken);
+
+      // when
+      const result = await userController.doLogin(loginDto);
+
+      const expectedResult = {
+        statusCode: 200,
+        message: 'LOGIN_SUCCESS',
+        data: mockToken,
+      };
+
+      // then
+      expect(result).toEqual(expectedResult);
+      expect(spyDoLoginFn).toHaveBeenCalledTimes(1);
+      expect(spyDoLoginFn).toHaveBeenCalledWith(loginDto);
     });
   });
 });
