@@ -189,6 +189,28 @@ describe('UserService', () => {
     });
   });
 
+  describe('verifyToken()', () => {
+    const id = 1;
+    const verifiedToken = {
+      sub: id,
+    };
+    const mockToken = 'token';
+
+    it('SUCCESS: 성공적으로 토큰를 검증한다.', async () => {
+      // given
+      const spyJwtVerifyAsyncFn = jest.spyOn(mockJwtService, 'verifyAsync');
+      spyJwtVerifyAsyncFn.mockReturnValueOnce(verifiedToken);
+
+      // when
+      const result = await userService.verifyToken(mockToken);
+
+      // then
+      expect(result).toEqual(verifiedToken);
+      expect(spyJwtVerifyAsyncFn).toHaveBeenCalledTimes(1);
+      expect(spyJwtVerifyAsyncFn).toHaveBeenCalledWith(mockToken);
+    });
+  });
+
   describe('findOneById()', () => {
     const id = 1;
     const mockUser = {
