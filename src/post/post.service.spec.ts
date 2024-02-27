@@ -15,6 +15,7 @@ describe('PostService', () => {
     post: {
       create: jest.fn(),
       findMany: jest.fn(),
+      findFirst: jest.fn(),
     },
   };
 
@@ -153,6 +154,33 @@ describe('PostService', () => {
       expect(spyPrismaPostFindManyFn).toHaveBeenCalledWith({
         where: {
           published: true,
+        },
+      });
+    });
+  });
+
+  describe('getPost()', () => {
+    const postId = 1;
+    const mockPost = {
+      id: postId,
+      title: 'test',
+      content: 'testtest',
+    };
+
+    it('SUCCESS: 성공적으로 포스트를 상세 조회한다.', async () => {
+      // given
+      const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
+      spyPrismaPostFindFirstFn.mockResolvedValueOnce(mockPost);
+
+      // when
+      const result = await postService.getPost(postId);
+
+      // then
+      expect(result).toEqual(mockPost);
+      expect(spyPrismaPostFindFirstFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaPostFindFirstFn).toHaveBeenCalledWith({
+        where: {
+          id: postId,
         },
       });
     });
