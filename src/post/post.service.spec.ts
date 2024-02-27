@@ -17,6 +17,7 @@ describe('PostService', () => {
       findMany: jest.fn(),
       findFirst: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     },
   };
 
@@ -224,7 +225,7 @@ describe('PostService', () => {
       content: 'testtest',
     };
 
-    it('SUCCESS: 성공적으로 포스트를 상세 조회한다.', async () => {
+    it('SUCCESS: 성공적으로 포스트를 수정한다.', async () => {
       // given
       const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
       spyPrismaPostFindFirstFn.mockResolvedValueOnce(mockPost);
@@ -264,6 +265,66 @@ describe('PostService', () => {
       let hasThrown = false;
       try {
         await postService.updatePost(userId, postId, updatePostDto);
+
+        // Then
+      } catch (error) {
+        hasThrown = true;
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.getStatus()).toEqual(HttpStatus.NOT_FOUND);
+        expect(error.getResponse()).toEqual({
+          error: 'Not Found',
+          message: 'NOT_FOUND_POST',
+          statusCode: 404,
+        });
+      }
+      expect(hasThrown).toBeTruthy();
+    });
+  });
+
+  describe('deletePost()', () => {
+    const userId = 1;
+    const postId = 1;
+    const mockPost = {
+      id: postId,
+      title: 'test',
+      content: 'testtest',
+    };
+
+    it('SUCCESS: 성공적으로 포스트를 삭제한다.', async () => {
+      // given
+      const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
+      spyPrismaPostFindFirstFn.mockResolvedValueOnce(mockPost);
+      const spyPrismaPostDeleteFn = jest.spyOn(mockPrisma.post, 'delete');
+
+      // when
+      const result = await postService.deletePost(userId, postId);
+
+      // then
+      expect(result).toBeUndefined();
+      expect(spyPrismaPostFindFirstFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaPostFindFirstFn).toHaveBeenCalledWith({
+        where: {
+          id: postId,
+        },
+      });
+      expect(spyPrismaPostDeleteFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaPostDeleteFn).toHaveBeenCalledWith({
+        where: {
+          userId: userId,
+          id: mockPost.id,
+        },
+      });
+    });
+
+    it('FAILURE: 포스트를 찾을 수 없으면 Not Found Exception을 반환한다.', async () => {
+      // given
+      const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
+      spyPrismaPostFindFirstFn.mockResolvedValueOnce(null);
+
+      // when
+      let hasThrown = false;
+      try {
+        await postService.deletePost(userId, postId);
 
         // Then
       } catch (error) {
