@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TokenAuthGuard } from './user/guard/token-auth.guard';
 import { ConfigModule } from '@nestjs/config';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     UserModule,
     PrismaModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [
