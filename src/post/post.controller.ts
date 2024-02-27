@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
@@ -14,6 +15,7 @@ import { ResponseMessage } from '../common/dto/response-message.enum';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostDetailResponse } from './dto/post-detail-response.dto';
 import { PostResponse } from './dto/post-response.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { PostService } from './post.service';
 
 @Controller('/posts')
@@ -50,5 +52,16 @@ export class PostController {
     return CommonResponseDto.success<PostDetailResponse>(
       ResponseMessage.READ_SUCCESS,
     ).setData(result);
+  }
+
+  @Patch('/:postId')
+  async updatePost(
+    @GetUser() user: User,
+    @Param('postId', ParseIntPipe) postId: number,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<CommonResponseDto<void>> {
+    await this.postService.updatePost(user.id, postId, updatePostDto);
+
+    return CommonResponseDto.success(ResponseMessage.UPDATE_SUCCESS);
   }
 }

@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostDetailResponse } from './dto/post-detail-response.dto';
 import { PostResponse } from './dto/post-response.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostService {
@@ -56,5 +57,28 @@ export class PostService {
     });
 
     return new PostDetailResponse(foundPost);
+  }
+
+  async updatePost(
+    userId: number,
+    postId: number,
+    updatePostDto: UpdatePostDto,
+  ): Promise<void> {
+    const foundPost = await this.prisma.post.findFirst({
+      where: {
+        id: postId,
+      },
+    });
+    if (!foundPost) {
+      throw new NotFoundException('NOT_FOUND_POST');
+    }
+
+    await this.prisma.post.update({
+      where: {
+        userId: userId,
+        id: foundPost.id,
+      },
+      data: updatePostDto,
+    });
   }
 }
