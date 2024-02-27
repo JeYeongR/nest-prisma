@@ -10,6 +10,7 @@ describe('PostController', () => {
   const mockPostService = {
     createPost: jest.fn(),
     getPostsAll: jest.fn(),
+    getPost: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -92,6 +93,35 @@ describe('PostController', () => {
       // then
       expect(result).toEqual(expectedResult);
       expect(spyGetPostsAllFn).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getPost()', () => {
+    const postId = 1;
+    const mockPostDetailResponse = {
+      id: 1,
+      title: 'test',
+      content: 'testtest',
+    };
+
+    it('SUCCESS: PostService의 getPost()를 정상적으로 호출한다.', async () => {
+      // given
+      const spyGetPostFn = jest.spyOn(mockPostService, 'getPost');
+      spyGetPostFn.mockResolvedValueOnce(mockPostDetailResponse);
+
+      const expectedResult = {
+        statusCode: 200,
+        message: 'READ_SUCCESS',
+        data: mockPostDetailResponse,
+      };
+
+      // when
+      const result = await postController.getPost(postId);
+
+      // then
+      expect(result).toEqual(expectedResult);
+      expect(spyGetPostFn).toHaveBeenCalledTimes(1);
+      expect(spyGetPostFn).toHaveBeenCalledWith(postId);
     });
   });
 });
