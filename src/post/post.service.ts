@@ -1,4 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
-export class PostService {}
+export class PostService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async createPost(user: User, createPostDto: CreatePostDto): Promise<void> {
+    const foundCategory = await this.prisma.category.findFirst({
+      where: {
+        name: createPostDto.category,
+      },
+    });
+    if (!foundCategory) {
+      throw new NotFoundException('NOT_FOUND_CATEGORY');
+    }
+
+    await this.prisma.post.create({
+      data: {
+        title: createPostDto.title,
+        content: createPostDto.content,
+        published: createPostDto.published,
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+        category: {
+          connect: {
+            id: foundCategory.id,
+          },
+        },
+      },
+    });
+  }
+}
