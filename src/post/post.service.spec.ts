@@ -14,6 +14,7 @@ describe('PostService', () => {
     },
     post: {
       create: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 
@@ -119,6 +120,41 @@ describe('PostService', () => {
         });
       }
       expect(hasThrown).toBeTruthy();
+    });
+  });
+
+  describe('getPostsAll()', () => {
+    const mockPosts = [
+      {
+        id: 1,
+        title: 'test',
+        content: 'testtest',
+      },
+    ];
+
+    it('SUCCESS: 성공적으로 포스트를 전체 조회한다.', async () => {
+      // given
+      const spyPrismaPostFindManyFn = jest.spyOn(mockPrisma.post, 'findMany');
+      spyPrismaPostFindManyFn.mockResolvedValueOnce(mockPosts);
+
+      const expectedResult = [
+        {
+          id: mockPosts[0].id,
+          title: mockPosts[0].title,
+        },
+      ];
+
+      // when
+      const result = await postService.getPostsAll();
+
+      // then
+      expect(result).toEqual(expectedResult);
+      expect(spyPrismaPostFindManyFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaPostFindManyFn).toHaveBeenCalledWith({
+        where: {
+          published: true,
+        },
+      });
     });
   });
 });
