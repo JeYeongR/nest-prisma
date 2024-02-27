@@ -11,6 +11,7 @@ describe('PostController', () => {
     createPost: jest.fn(),
     getPostsAll: jest.fn(),
     getPost: jest.fn(),
+    updatePost: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -122,6 +123,43 @@ describe('PostController', () => {
       expect(result).toEqual(expectedResult);
       expect(spyGetPostFn).toHaveBeenCalledTimes(1);
       expect(spyGetPostFn).toHaveBeenCalledWith(postId);
+    });
+  });
+
+  describe('updatePost()', () => {
+    const user = {
+      id: 1,
+    };
+    const postId = 1;
+    const updatePostDto = {
+      title: 'test2',
+      content: 'testtest2',
+    };
+
+    it('SUCCESS: PostService의 updatePost()를 정상적으로 호출한다.', async () => {
+      // given
+      const spyUpdatePostFn = jest.spyOn(mockPostService, 'updatePost');
+
+      const expectedResult = {
+        statusCode: 200,
+        message: 'UPDATE_SUCCESS',
+      };
+
+      // when
+      const result = await postController.updatePost(
+        user as User,
+        postId,
+        updatePostDto,
+      );
+
+      // then
+      expect(result).toEqual(expectedResult);
+      expect(spyUpdatePostFn).toHaveBeenCalledTimes(1);
+      expect(spyUpdatePostFn).toHaveBeenCalledWith(
+        user.id,
+        postId,
+        updatePostDto,
+      );
     });
   });
 });
