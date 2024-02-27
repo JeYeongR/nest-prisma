@@ -16,6 +16,7 @@ describe('PostService', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn(),
+      update: jest.fn(),
     },
   };
 
@@ -194,6 +195,75 @@ describe('PostService', () => {
       let hasThrown = false;
       try {
         await postService.getPost(postId);
+
+        // Then
+      } catch (error) {
+        hasThrown = true;
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.getStatus()).toEqual(HttpStatus.NOT_FOUND);
+        expect(error.getResponse()).toEqual({
+          error: 'Not Found',
+          message: 'NOT_FOUND_POST',
+          statusCode: 404,
+        });
+      }
+      expect(hasThrown).toBeTruthy();
+    });
+  });
+
+  describe('updatePost()', () => {
+    const userId = 1;
+    const postId = 1;
+    const updatePostDto = {
+      title: 'test2',
+      content: 'testtest2',
+    };
+    const mockPost = {
+      id: postId,
+      title: 'test',
+      content: 'testtest',
+    };
+
+    it('SUCCESS: 성공적으로 포스트를 상세 조회한다.', async () => {
+      // given
+      const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
+      spyPrismaPostFindFirstFn.mockResolvedValueOnce(mockPost);
+      const spyPrismaPostUpdateFn = jest.spyOn(mockPrisma.post, 'update');
+
+      // when
+      const result = await postService.updatePost(
+        userId,
+        postId,
+        updatePostDto,
+      );
+
+      // then
+      expect(result).toBeUndefined();
+      expect(spyPrismaPostFindFirstFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaPostFindFirstFn).toHaveBeenCalledWith({
+        where: {
+          id: postId,
+        },
+      });
+      expect(spyPrismaPostUpdateFn).toHaveBeenCalledTimes(1);
+      expect(spyPrismaPostUpdateFn).toHaveBeenCalledWith({
+        where: {
+          userId: userId,
+          id: mockPost.id,
+        },
+        data: updatePostDto,
+      });
+    });
+
+    it('FAILURE: 포스트를 찾을 수 없으면 Not Found Exception을 반환한다.', async () => {
+      // given
+      const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
+      spyPrismaPostFindFirstFn.mockResolvedValueOnce(null);
+
+      // when
+      let hasThrown = false;
+      try {
+        await postService.updatePost(userId, postId, updatePostDto);
 
         // Then
       } catch (error) {
