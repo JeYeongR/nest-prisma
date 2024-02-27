@@ -12,6 +12,7 @@ describe('PostController', () => {
     getPostsAll: jest.fn(),
     getPost: jest.fn(),
     updatePost: jest.fn(),
+    deletePost: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -160,6 +161,31 @@ describe('PostController', () => {
         postId,
         updatePostDto,
       );
+    });
+  });
+
+  describe('deletePost()', () => {
+    const user = {
+      id: 1,
+    };
+    const postId = 1;
+
+    it('SUCCESS: PostService의 deletePost()를 정상적으로 호출한다.', async () => {
+      // given
+      const spyDeletePostFn = jest.spyOn(mockPostService, 'deletePost');
+
+      const expectedResult = {
+        statusCode: 200,
+        message: 'DELETE_SUCCESS',
+      };
+
+      // when
+      const result = await postController.deletePost(user as User, postId);
+
+      // then
+      expect(result).toEqual(expectedResult);
+      expect(spyDeletePostFn).toHaveBeenCalledTimes(1);
+      expect(spyDeletePostFn).toHaveBeenCalledWith(user.id, postId);
     });
   });
 });
