@@ -184,5 +184,29 @@ describe('PostService', () => {
         },
       });
     });
+
+    it('FAILURE: 포스트를 찾을 수 없으면 Not Found Exception을 반환한다.', async () => {
+      // given
+      const spyPrismaPostFindFirstFn = jest.spyOn(mockPrisma.post, 'findFirst');
+      spyPrismaPostFindFirstFn.mockResolvedValueOnce(null);
+
+      // when
+      let hasThrown = false;
+      try {
+        await postService.getPost(postId);
+
+        // Then
+      } catch (error) {
+        hasThrown = true;
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.getStatus()).toEqual(HttpStatus.NOT_FOUND);
+        expect(error.getResponse()).toEqual({
+          error: 'Not Found',
+          message: 'NOT_FOUND_POST',
+          statusCode: 404,
+        });
+      }
+      expect(hasThrown).toBeTruthy();
+    });
   });
 });
