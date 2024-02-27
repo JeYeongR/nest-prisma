@@ -84,4 +84,22 @@ export class PostService {
       data: updatePostDto,
     });
   }
+
+  async deletePost(userId: number, postId: number): Promise<void> {
+    const foundPost = await this.prisma.post.findFirst({
+      where: {
+        id: postId,
+      },
+    });
+    if (!foundPost) {
+      throw new NotFoundException('NOT_FOUND_POST');
+    }
+
+    await this.prisma.post.delete({
+      where: {
+        userId: userId,
+        id: foundPost.id,
+      },
+    });
+  }
 }
