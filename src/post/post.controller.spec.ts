@@ -9,6 +9,7 @@ describe('PostController', () => {
 
   const mockPostService = {
     createPost: jest.fn(),
+    getPostsAll: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -48,21 +49,49 @@ describe('PostController', () => {
       // given
       const spyCreatePostFn = jest.spyOn(mockPostService, 'createPost');
 
+      const expectedResult = {
+        statusCode: 201,
+        message: 'CREATE_SUCCESS',
+      };
+
       // when
       const result = await postController.createPost(
         user as User,
         createPostDto,
       );
 
-      const expectedResult = {
-        statusCode: 201,
-        message: 'CREATE_SUCCESS',
-      };
-
       // then
       expect(result).toEqual(expectedResult);
       expect(spyCreatePostFn).toHaveBeenCalledTimes(1);
       expect(spyCreatePostFn).toHaveBeenCalledWith(user as User, createPostDto);
+    });
+  });
+
+  describe('getPostsAll()', () => {
+    const mockPostResponses = [
+      {
+        id: 1,
+        title: 'test',
+      },
+    ];
+
+    it('SUCCESS: PostService의 getPostsAll()를 정상적으로 호출한다.', async () => {
+      // given
+      const spyGetPostsAllFn = jest.spyOn(mockPostService, 'getPostsAll');
+      spyGetPostsAllFn.mockResolvedValueOnce(mockPostResponses);
+
+      const expectedResult = {
+        statusCode: 200,
+        message: 'READ_SUCCESS',
+        data: mockPostResponses,
+      };
+
+      // when
+      const result = await postController.getPostsAll();
+
+      // then
+      expect(result).toEqual(expectedResult);
+      expect(spyGetPostsAllFn).toHaveBeenCalledTimes(1);
     });
   });
 });
