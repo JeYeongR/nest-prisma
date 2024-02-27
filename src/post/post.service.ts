@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { PostResponse } from './dto/post-response.dto';
 
 @Injectable()
 export class PostService {
@@ -34,5 +35,15 @@ export class PostService {
         },
       },
     });
+  }
+
+  async getPostsAll(): Promise<PostResponse[]> {
+    const foundPosts = await this.prisma.post.findMany({
+      where: {
+        published: true,
+      },
+    });
+
+    return foundPosts.map((foundPost) => new PostResponse(foundPost));
   }
 }
