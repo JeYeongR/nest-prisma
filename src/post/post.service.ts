@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { PostDetailResponse } from './dto/post-detail-response.dto';
 import { PostResponse } from './dto/post-response.dto';
 
 @Injectable()
@@ -45,5 +46,15 @@ export class PostService {
     });
 
     return foundPosts.map((foundPost) => new PostResponse(foundPost));
+  }
+
+  async getPost(postId: number): Promise<PostDetailResponse> {
+    const foundPost = await this.prisma.post.findFirst({
+      where: {
+        id: postId,
+      },
+    });
+
+    return new PostDetailResponse(foundPost);
   }
 }
