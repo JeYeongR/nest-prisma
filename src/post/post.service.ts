@@ -55,6 +55,9 @@ export class PostService {
         id: postId,
       },
     });
+    if (!foundPost) {
+      throw new NotFoundException('NOT_FOUND_POST');
+    }
 
     return new PostDetailResponse(foundPost);
   }
